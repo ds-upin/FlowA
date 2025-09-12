@@ -5,16 +5,28 @@ import SenderMessageBox from '../components/SenderMessageBox';
 import RecieverMessageBox from '../components/RecieverMessageBox';
 import SelectedUser from '../components/SelectedUser';
 import InputMessage from '../components/InputMessage';
-import { useState } from 'react';
+import { useState,useContext } from 'react';
+import { LoaderContext } from '../contexts/Loader';
+import { ShowPopupContext } from '../contexts/ShowPopup';
+import { StateContext } from '../contexts/State';
+import ContactProfile from '../components/ConatactProfile';
+import Profile from '../components/Profile';
+import Login from '../components/Login';
+import Register from '../components/Register';
 
 
 const Home = () => {
-    const [showPopup,setShowPopup] = useState(false);
-    const [loader, setLader] = useState(true);
+    const {showPopup,setShowPopup} = useContext(ShowPopupContext);
+    const {loader,setLoader} = useContext(LoaderContext);
+    const {showContactProfile, setShowContactProfile,showProfile, setShowProfile} = useContext(StateContext);
 
     return <div className="flex w-[100vw] h-[100vh] bg-gradient-to-r from-red-100 to-blue-400">
-        <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup?'pointer-events-none filter blur-sm':''}`}>
+        {showContactProfile?<ContactProfile showContact={setShowContactProfile}/>:null}
+        {showProfile?<Profile/>:null}
+        {<Login/>}
         {loader?<Loader/>:null}
+        <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup?'pointer-events-none filter blur-sm':''}`}>
+        
             <div className="col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center">
                 <i className=" text-red-500 text-shadow-lg/40 fa-solid fa-comments text-7xl"></i>
                 <div className="font-serif text-red-500 text-shadow-lg/40 cursor-default italic text-3xl">
@@ -24,7 +36,7 @@ const Home = () => {
                 <div className="text-lg"><i className="fas fa-search"></i></div>
             </div>
 
-            {<SelectedUser/>}
+            {<SelectedUser showContact={setShowContactProfile}/>}
 
             <div className="col-span-1 overflow-y-auto rounded-bl-xl scroll-smooth row-span-4 border-1">
                 {[1,2,3,4,5,6,7,8].map((i)=><ContactCard key={i}/>)}
@@ -34,7 +46,6 @@ const Home = () => {
                 <div className="grow-1 basis-4/5 overflow-y-auto scroll-smooth flex flex-col">
                     {<SenderMessageBox/>}
                     {<RecieverMessageBox/>}
-
                 </div>
                 {<InputMessage/>}
             </div>
