@@ -1,49 +1,64 @@
-import assett from '../assets/assett.jpg';
+import { useState, useContext, useEffect } from 'react';
+import { io } from 'socket.io-client';
+
+import { AuthContext } from '../contexts/Auth';
+import { StateContext } from '../contexts/State';
+import { LoaderContext } from '../contexts/Loader';
+import { ContactContext } from '../contexts/Contact';
+import { SocketContext } from '../contexts/Socket';
+import { ChatContext } from '../contexts/Chat';
+import { ShowPopupContext } from '../contexts/ShowPopup';
+
+import { getContactList } from '../services/contact.api';
+
+import Login from '../components/Login';
 import Loader from '../components/Loader';
+import Profile from '../components/Profile';
+import Register from '../components/Register';
+import AddContact from '../components/AddContact';
 import ContactCard from '../components/ContactCard';
-import SenderMessageBox from '../components/SenderMessageBox';
-import RecieverMessageBox from '../components/RecieverMessageBox';
 import SelectedUser from '../components/SelectedUser';
 import InputMessage from '../components/InputMessage';
-import { useState, useContext, useEffect } from 'react';
-import { LoaderContext } from '../contexts/Loader';
-import { ShowPopupContext } from '../contexts/ShowPopup';
-import { StateContext } from '../contexts/State';
-import { AuthContext } from '../contexts/Auth';
 import ContactProfile from '../components/ConatactProfile';
-import Profile from '../components/Profile';
-import Login from '../components/Login';
-import Register from '../components/Register';
+import SenderMessageBox from '../components/SenderMessageBox';
 import EmailVerification from '../components/EmailVerification';
-import { getContactList } from '../services/contact.api';
-import { ContactContext } from '../contexts/Contact';
-import AddContact from '../components/AddContact';
+import RecieverMessageBox from '../components/RecieverMessageBox';
 
 
 const Home = () => {
+    const { socket } = useContext(SocketContext);
     const [selectedUser, setSelectedUser] = useState(null);
+    const { chat, setChat } = useContext(ChatContext);
     const { auth, setAuth } = useContext(AuthContext);
-    const { showPopup, setShowPopup } = useContext(ShowPopupContext);
     const { loader, setLoader } = useContext(LoaderContext);
     const { contact, setContact } = useContext(ContactContext);
+    const { showPopup, setShowPopup } = useContext(ShowPopupContext);
     const { showContactProfile, setShowContactProfile, showEmailVerification, setShowEmailVerification, showProfile, setShowProfile, showRegister, setShowRegister, showLogin, setShowLogin } = useContext(StateContext);
+
+    useEffect(() => {
+        if (!socket) return;
+        socket.emit('registerUser');
+        socket.on('recieveMessage', (data) => {
+            console.log(data);
+            setChat(prevChat => [...prevChat, data]);
+        })
+    }, [socket, auth.id])
 
     useEffect(() => {
         const shouldShowPopup = showContactProfile || showProfile || showRegister || showLogin || showEmailVerification;
         setShowPopup(shouldShowPopup);
     }, [showContactProfile, showProfile, showRegister, showLogin, showEmailVerification, setShowPopup]);
+
     useEffect(() => {
         if (auth.email == '') {
             setShowLogin(true);
         }
         else {
             setShowLogin(false);
-            console.log(auth);
         }
     }, [auth]);
     const getContacts = async () => {
         try {
-            //console.log('authtoken',auth.token);
             const res = await getContactList(auth.token);
             if (res.status == 200) {
                 setContact(res.data.contacts);
@@ -61,6 +76,14 @@ const Home = () => {
             getContacts();
         }
     }, [auth]);
+
+
+
+
+
+
+
+
 
     return <div className="flex w-[100vw] h-[100vh] bg-gradient-to-r from-red-100 to-blue-400">
 
@@ -94,7 +117,7 @@ const Home = () => {
                     {<SenderMessageBox />}
                     {<RecieverMessageBox />}
                 </div>
-                {<InputMessage />}
+                {<InputMessage selectedUser={selectedUser} />}
             </div>
         </div>
     </div>

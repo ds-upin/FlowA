@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/Auth';
 import { LoaderProvider } from './contexts/Loader';
 import { ShowPopupProvider } from './contexts/ShowPopup';
 import { StateProvider } from './contexts/State';
+import { SocketProvider } from './contexts/Socket';
 
 function App() {
 
@@ -18,11 +19,13 @@ function App() {
                         <ChatProvider>
                             <StateProvider>
                                 <ShowPopupProvider>
-                                    <BrowserRouter>
-                                        <Routes>
-                                            <Route path="/" element={<Home />} />
-                                        </Routes>
-                                    </BrowserRouter>
+                                    <SocketProvider>
+                                        <BrowserRouter>
+                                            <Routes>
+                                                <Route path="/" element={<Home />} />
+                                            </Routes>
+                                        </BrowserRouter>
+                                    </SocketProvider>
                                 </ShowPopupProvider>
                             </StateProvider>
                         </ChatProvider>

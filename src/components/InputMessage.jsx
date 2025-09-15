@@ -1,4 +1,22 @@
-const InputMessage = () => {
+import { useEffect, useRef, useState } from "react";
+import { useContext } from "react";
+import { SocketContext } from "../contexts/Socket";
+import { AuthContext } from "../contexts/Auth";
+
+const InputMessage = (props) => {
+    const selectedUser = props.selectedUser;
+    const {auth,setAuth} = useContext(AuthContext);
+    const {socket} = useContext(SocketContext);
+    const inputRef = useRef();
+    
+    const sendMessage = () => {
+        const message = inputRef.current.value.trim();
+        if(message=='') return;
+        if(auth.email==''||selectedUser==null) return;
+        socket.emit('sendMessage',{message,senderId:auth.id,id:selectedUser._id,date:Date.now()});
+        inputRef.current.value='';
+    };
+
     return (
         <div className="basis-1/5 flex justify-center items-center border-2 border-solid rounded-br-xl">
 
@@ -8,11 +26,11 @@ const InputMessage = () => {
             <div className="w-[70%] shadow-red-500">
                 <textarea
                     className="w-full border resize-none text-[120%] bg-red text-black rounded-lg focus:ring focus:ring-red-300 overflow-hidden"
-                    placeholder="Write your message..."
+                    placeholder="Write your message..." ref={inputRef}
                     rows="1"
                 />
             </div>
-            <button className="ml-1 px-4 bg-blue-500 text-[120%] mb-2 rounded-lg hover:bg-blue-950">
+            <button className="ml-1 px-4 bg-blue-500 text-[120%] mb-2 rounded-lg hover:bg-blue-950" onClick={sendMessage}>
                 <i className="text-white text-lg fa-solid fa-paper-plane"></i>
             </button>
         </div>
