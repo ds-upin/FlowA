@@ -1,15 +1,14 @@
 import { StateContext } from '../contexts/State';
-import {ShowPopupContext} from '../contexts/ShowPopup';
+import { AuthContext } from '../contexts/Auth';
 import { useContext, useState } from 'react';
 import profileImg from '../assets/assett.jpg';
 
 const Profile = () => {
+    const {auth,setAuth} = useContext(AuthContext);
     const {showProfile,setShowProfile} = useContext(StateContext);
-    const {showPopup, setShowPopup} = useContext(ShowPopupContext);
 
     const closeProfile = () => {
         setShowProfile(false);
-        setShowPopup(false);
     };
 
     return (
@@ -21,9 +20,9 @@ const Profile = () => {
                 <img src={profileImg} />
             </div>
             <div className="text-center"><button>Change Image</button></div>
-            <div className="text-center pt-5 text-2xl">Someone</div>
-            <div className='text-md text-center mt-3'><span>Username: </span><span>@ds_upin</span></div>
-            <div className='text-md text-center mt-3'><span>Email: </span><span>divyanshu.singh.bzzf@gmail.com</span></div>
+            <div className="text-center pt-5 text-2xl">{auth.name}</div>
+            <div className='text-md text-center mt-3'><span>Username: </span><span>{auth.username}</span></div>
+            <div className='text-md text-center mt-3'><span>Email: </span><span>{auth.email}</span></div>
             <div className='text-md w-full flex justify-center mt-3'>
                 <button className='bg-orange-500 cursor-pointer hover:bg-orange-600 rounded-lg px-5'>Delete Account</button>
             </div>

@@ -1,31 +1,28 @@
 import assett from '../assets/assett.jpg';
 import { useContext } from 'react';
 import { LoaderContext } from '../contexts/Loader';
-import {ShowPopupContext} from '../contexts/ShowPopup';
 import { StateContext } from '../contexts/State';
 
 const SelectedUser = (props) => {
     const {loader,setLoader} = useContext(LoaderContext);
     const {showProfile,setShowProfile} = useContext(StateContext);
-    const {showPopup,setShowPopup} = useContext(ShowPopupContext);
+    const selectedUser = props.selectedUser;
 
     const triggerContactProfile = () => {
-        setShowPopup(true);
         props.showContact(true);
     };
 
     const showUserProfile = () => {
-        setShowPopup(true);
         setShowProfile(true);
     }
 
     return (
         <div className="col-span-2 rounded-tr-xl row-span-1 bg-gray-400 flex flex-row items-center gap-3">
             <div className="ml-6 rounded-full h-[70%] aspect-1/1 bg-blue-500 cover overflow-hidden cursor-pointer" onClick={triggerContactProfile}>
-                <img src={assett} />
+                {selectedUser?<img src={assett} />:null}
             </div>
             <div className="text-4xl cursor-pointer" onClick={triggerContactProfile}>
-                Someone
+                {selectedUser?selectedUser.name:""}
             </div>
             <div className='grow-1'></div>
             <div className='mr-6 text-4xl'><button onClick={showUserProfile}>
