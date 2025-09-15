@@ -35,14 +35,48 @@ const Home = () => {
     const { showPopup, setShowPopup } = useContext(ShowPopupContext);
     const { showContactProfile, setShowContactProfile, showEmailVerification, setShowEmailVerification, showProfile, setShowProfile, showRegister, setShowRegister, showLogin, setShowLogin } = useContext(StateContext);
 
+    const addNewUserForChat = (userId) => {
+        setChat(prevChat => ({
+            ...prevChat,
+            [userId]: []  // or [initialMessage]
+        }));
+    };
+    const addMessageToChat = (userId, newMessage) => {
+        setChat(prevChat => ({
+            ...prevChat,
+            [userId]: [
+                ...(prevChat[userId] || []),  // fallback in case user doesn't exist
+                newMessage
+            ]
+        }));
+    };
+
+
+
     useEffect(() => {
         if (!socket) return;
         socket.emit('registerUser');
-        socket.on('recieveMessage', (data) => {
-            console.log(data);
-            setChat(prevChat => [...prevChat, data]);
-        })
-    }, [socket, auth.id])
+
+        const handleMessage = (data) => {
+            console.log('Received message:', data);
+            const { senderId, recieverId, message, date } = data;
+            const chatPartnerId = senderId === auth.id ? recieverId : senderId;
+            const formattedMessage = {
+                senderId,
+                recieverId,
+                message,
+                date
+            };
+            addMessageToChat(chatPartnerId, formattedMessage);
+        };
+
+        socket.on('recieveMessage', handleMessage);
+
+        return () => {
+            socket.off('recieveMessage', handleMessage);
+        };
+    }, [socket, auth.id]);
+
 
     useEffect(() => {
         const shouldShowPopup = showContactProfile || showProfile || showRegister || showLogin || showEmailVerification;
@@ -85,7 +119,7 @@ const Home = () => {
 
 
 
-    return <div className="flex w-[100vw] h-[100vh] bg-gradient-to-r from-red-100 to-blue-400">
+    return <div className="flex w-[100vw] h-[100vh] bg-gradient-to-r from-gray-300 to-gray-400">
 
         {showContactProfile ? <ContactProfile showContact={setShowContactProfile} getContacts={getContacts} setSelectedUser={setSelectedUser} selectedUser={selectedUser} /> : null}
         {showProfile ? <Profile /> : null}
