@@ -54,3 +54,22 @@ export const removeContact = async ({ token, contactId }) => {
         return { status: 500, data: { mess: 'Network error while removing contact' } };
     }
 };
+
+export const addToContactByIds = async(token,ids) =>{
+    try{
+        const res = await fetch(`${baseurl}/api/contact/addList`,{
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body:JSON.stringify({ids:ids}),
+        })
+        const data = await res.json();
+        return {status:res.status, data:data}
+    }
+    catch(err){
+        console.log('errr in adding contacs',err);
+        return {status:999, data:'Failure'}
+    }
+}
