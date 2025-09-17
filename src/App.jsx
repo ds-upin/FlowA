@@ -8,6 +8,7 @@ import { LoaderProvider } from './contexts/Loader';
 import { ShowPopupProvider } from './contexts/ShowPopup';
 import { StateProvider } from './contexts/State';
 import { SocketProvider } from './contexts/Socket';
+import { BlockedProvider } from './contexts/Blocked';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
                         <ChatProvider>
                             <StateProvider>
                                 <ShowPopupProvider>
+                                    <BlockedProvider>
                                     <SocketProvider>
                                         <BrowserRouter>
                                             <Routes>
@@ -26,6 +28,7 @@ function App() {
                                             </Routes>
                                         </BrowserRouter>
                                     </SocketProvider>
+                                    </BlockedProvider>
                                 </ShowPopupProvider>
                             </StateProvider>
                         </ChatProvider>

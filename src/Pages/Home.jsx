@@ -23,7 +23,9 @@ import InputMessage from '../components/InputMessage';
 import ContactProfile from '../components/ConatactProfile';
 import SenderMessageBox from '../components/SenderMessageBox';
 import EmailVerification from '../components/EmailVerification';
+import BlockedUser from '../components/blockedUser';
 import RecieverMessageBox from '../components/RecieverMessageBox';
+import { BlockedContext } from '../contexts/Blocked';
 
 
 const Home = () => {
@@ -35,7 +37,8 @@ const Home = () => {
     const { loader, setLoader } = useContext(LoaderContext);
     const { contact, setContact } = useContext(ContactContext);
     const { showPopup, setShowPopup } = useContext(ShowPopupContext);
-    const { showContactProfile, setShowContactProfile, showEmailVerification, setShowEmailVerification, showProfile, setShowProfile, showRegister, setShowRegister, showLogin, setShowLogin } = useContext(StateContext);
+    const {blocked,setBlocked} = useContext(BlockedContext);
+    const { showContactProfile, setShowContactProfile,showBlockedUsers,setShowBlockedUsers, showEmailVerification, setShowEmailVerification, showProfile, setShowProfile, showRegister, setShowRegister, showLogin, setShowLogin } = useContext(StateContext);
 
     const addNewUserForChat = (userId) => {
         setChat(prevChat => ({
@@ -139,7 +142,9 @@ const Home = () => {
         try {
             const res = await getContactList(auth.token);
             if (res.status == 200) {
+                console.log(res.data)
                 setContact(res.data.contacts);
+                setBlocked(res.data.blocked);
             } else {
                 console.log("Error in fetching contact");
                 alert(("Error in fetching contact list"));
@@ -198,6 +203,7 @@ const Home = () => {
         {showRegister ? <Register /> : null}
         {showLogin ? <Login /> : null}
         {showEmailVerification ? <EmailVerification /> : null}
+        {showBlockedUsers?<BlockedUser/>:null}
 
         <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup ? 'pointer-events-none filter blur-sm' : ''}`}>
 

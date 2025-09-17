@@ -4,13 +4,14 @@ import { StateContext } from '../contexts/State';
 import { useContext } from 'react';
 import profileImg from '../assets/assett.jpg';
 import { removeContact } from '../services/contact.api';
+import { blockContact } from '../services/block.api'
 
 const ContactProfile = (props) => {
     const getContacts = props.getContacts;
     const selectedUser = props.selectedUser;
     const setSelectedUser = props.setSelectedUser;
-    const {setShowContactProfile} = useContext(StateContext);
-    const {auth, setAuth} = useContext(AuthContext);
+    const { setShowContactProfile } = useContext(StateContext);
+    const { auth, setAuth } = useContext(AuthContext);
     const { showPopup, setShowPopup } = useContext(ShowPopupContext);
     const closeProfile = () => {
         props.showContact(false);
@@ -18,7 +19,7 @@ const ContactProfile = (props) => {
     };
 
     const removeThisContact = async () => {
-        console.log(selectedUser);
+        //console.log(selectedUser);
         try {
             const res = await removeContact({
                 token: auth.token,
@@ -27,6 +28,28 @@ const ContactProfile = (props) => {
 
             if (res.status === 200) {
                 console.log("Contact removed successfully:", res.data.mess);
+                getContacts();
+                setSelectedUser(null);
+                setShowContactProfile(false);
+
+            } else {
+                console.error("Error:", res.data.mess);
+                alert(res.data.mess);
+            }
+        } catch (err) {
+            console.error("Error removing contact:", err);
+            alert("Something went wrong while removing contact.");
+        }
+    };
+
+    const blockThisUser = async () => {
+        try {
+            const res = await blockContact({
+                token: auth.token,
+                username: selectedUser.username
+            });
+            if (res.status === 200) {
+                alert("Contact blocked successfully:", res.data.mess);
                 getContacts();
                 setSelectedUser(null);
                 setShowContactProfile(false);
@@ -53,7 +76,7 @@ const ContactProfile = (props) => {
             <div className='text-md text-center mt-7'><span>Username: </span><span>{selectedUser ? selectedUser.username : ""}</span></div>
             <div className='text-md w-full flex justify-center mt-7'>
                 <button className='bg-orange-500 cursor-pointer hover:bg-orange-600 rounded-lg px-5' onClick={removeThisContact}>Delete</button>
-                <button className='ml-2 cursor-pointer bg-red-500 hover:bg-red-600 rounded-lg px-5'>Block</button>
+                <button className='ml-2 cursor-pointer bg-red-500 hover:bg-red-600 rounded-lg px-5' onClick={blockThisUser}>Block</button>
             </div>
         </div>
     );

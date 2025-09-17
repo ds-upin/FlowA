@@ -5,11 +5,15 @@ import profileImg from '../assets/assett.jpg';
 
 const Profile = () => {
     const {auth,setAuth} = useContext(AuthContext);
-    const {showProfile,setShowProfile} = useContext(StateContext);
+    const {showProfile,showBlockedUsers, setShowBlockedUsers,setShowProfile} = useContext(StateContext);
 
     const closeProfile = () => {
         setShowProfile(false);
     };
+
+    const openBlockedUser = () => {
+        setShowBlockedUsers(true);
+    }
 
     return (
         <div className="fixed h-[90%] w-[90%] left-[5%] top-[5%] md:top-[15%] md:left-[35%] md:m-auto md:w-[30%] md:h-[70%] bg-gray-900 text-white z-5 rounded-xl cursor-default">
@@ -23,6 +27,7 @@ const Profile = () => {
             <div className="text-center pt-5 text-2xl">{auth.name}</div>
             <div className='text-md text-center mt-3'><span>Username: </span><span>{auth.username}</span></div>
             <div className='text-md text-center mt-3'><span>Email: </span><span>{auth.email}</span></div>
+            <div className='text-md text-center mt-3'><button onClick={openBlockedUser} className='cursor-pointer bg-blue-500 hover:bg-blue-600 p-1 rounded-lg'>All Blocked User</button></div>
             <div className='text-md w-full flex justify-center mt-3'>
                 {/* <button className='bg-orange-500 cursor-pointer hover:bg-orange-600 rounded-lg px-5' >Delete Account</button> */}
             </div>

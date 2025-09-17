@@ -8,8 +8,9 @@ export const StateProvider = (props) => {
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
     const [showEmailVerification, setShowEmailVerification] = useState(false);
+    const [showBlockedUsers, setShowBlockedUsers] = useState(false);
     return (
-        <StateContext.Provider value={{ showContactProfile, setShowContactProfile, showProfile, setShowProfile, showLogin, setShowLogin, showRegister, setShowRegister, showEmailVerification, setShowEmailVerification }}>
+        <StateContext.Provider value={{showBlockedUsers,setShowBlockedUsers, showContactProfile, setShowContactProfile, showProfile, setShowProfile, showLogin, setShowLogin, showRegister, setShowRegister, showEmailVerification, setShowEmailVerification }}>
             {props.children}
         </StateContext.Provider>
     );
