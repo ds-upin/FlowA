@@ -41,14 +41,14 @@ const Home = () => {
     const addNewUserForChat = (userId) => {
         setChat(prevChat => ({
             ...prevChat,
-            [userId]: []  // or [initialMessage]
+            [userId]: []  
         }));
     };
     const addMessageToChat = (userId, newMessage) => {
         setChat(prevChat => ({
             ...prevChat,
             [userId]: [
-                ...(prevChat[userId] || []),  // fallback in case user doesn't exist
+                ...(prevChat[userId] || []), 
                 newMessage
             ]
         }));
