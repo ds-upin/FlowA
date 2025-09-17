@@ -37,8 +37,8 @@ const Home = () => {
     const { loader, setLoader } = useContext(LoaderContext);
     const { contact, setContact } = useContext(ContactContext);
     const { showPopup, setShowPopup } = useContext(ShowPopupContext);
-    const {blocked,setBlocked} = useContext(BlockedContext);
-    const { showContactProfile, setShowContactProfile,showBlockedUsers,setShowBlockedUsers, showEmailVerification, setShowEmailVerification, showProfile, setShowProfile, showRegister, setShowRegister, showLogin, setShowLogin } = useContext(StateContext);
+    const { blocked, setBlocked } = useContext(BlockedContext);
+    const { showContactProfile, setShowContactProfile, showBlockedUsers, setShowBlockedUsers, showEmailVerification, setShowEmailVerification, showProfile, setShowProfile, showRegister, setShowRegister, showLogin, setShowLogin } = useContext(StateContext);
 
     const addNewUserForChat = (userId) => {
         setChat(prevChat => ({
@@ -64,6 +64,7 @@ const Home = () => {
 
         const handleMessage = (data) => {
             console.log('Received message:', data);
+            console.log('user',blocked);
             const { senderId, recieverId, message, date, } = data;
             const chatPartnerId = senderId === auth.id ? recieverId : senderId;
             const formattedMessage = {
@@ -72,6 +73,12 @@ const Home = () => {
                 message,
                 date
             };
+            const isBlocked = blocked.some(user => user._id === chatPartnerId);
+            
+            if (isBlocked) {
+                console.log('Message ignored because sender is blocked:', chatPartnerId);
+                return;
+            }
             addMessageToChat(chatPartnerId, formattedMessage);
             const isInContacts = contact.some(c => c._id === chatPartnerId);
             if (!isInContacts) {
@@ -97,7 +104,7 @@ const Home = () => {
         return () => {
             socket.off('recieveMessage', handleMessage);
         };
-    }, [socket, auth.id]);
+    }, [socket, auth.id,blocked]);
 
     useEffect(() => {
         const syncContactsWithChat = async () => {
@@ -203,7 +210,7 @@ const Home = () => {
         {showRegister ? <Register /> : null}
         {showLogin ? <Login /> : null}
         {showEmailVerification ? <EmailVerification /> : null}
-        {showBlockedUsers?<BlockedUser/>:null}
+        {showBlockedUsers ? <BlockedUser /> : null}
 
         <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup ? 'pointer-events-none filter blur-sm' : ''}`}>
 
