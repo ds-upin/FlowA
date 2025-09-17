@@ -1,5 +1,4 @@
 import { useState, useContext, useEffect } from 'react';
-import { io } from 'socket.io-client';
 
 import { AuthContext } from '../contexts/Auth';
 import { StateContext } from '../contexts/State';
@@ -41,14 +40,14 @@ const Home = () => {
     const addNewUserForChat = (userId) => {
         setChat(prevChat => ({
             ...prevChat,
-            [userId]: []  
+            [userId]: []
         }));
     };
     const addMessageToChat = (userId, newMessage) => {
         setChat(prevChat => ({
             ...prevChat,
             [userId]: [
-                ...(prevChat[userId] || []), 
+                ...(prevChat[userId] || []),
                 newMessage
             ]
         }));
@@ -96,6 +95,31 @@ const Home = () => {
             socket.off('recieveMessage', handleMessage);
         };
     }, [socket, auth.id]);
+
+    useEffect(() => {
+        const syncContactsWithChat = async () => {
+            if (!auth.token || Object.keys(chat).length === 0 || contact.length === 0) return;
+            const chatIds = Object.keys(chat);
+            const contactIds = contact.map(c => c._id);
+            const extraIds = chatIds.filter(id => !contactIds.includes(id));
+
+            if (extraIds.length === 0) return;
+
+            try {
+                const res = await addToContactByIds(auth.token, extraIds);
+                if (res.status === 200) {
+                    setContact(prevContacts => [...prevContacts, ...res.data.added]);
+                } else {
+                    console.error('Failed to add extra contacts:', res);
+                }
+            } catch (err) {
+                console.error('Error adding extra contacts:', err);
+            }
+        };
+
+        syncContactsWithChat();
+    }, [chat, contact, auth.token]);
+
 
 
     useEffect(() => {
