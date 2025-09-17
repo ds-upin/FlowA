@@ -10,6 +10,7 @@ import { ChatContext } from '../contexts/Chat';
 import { ShowPopupContext } from '../contexts/ShowPopup';
 
 import { getContactList } from '../services/contact.api';
+import { getPendingList } from '../services/message.api';
 
 import Login from '../components/Login';
 import Loader from '../components/Loader';
@@ -17,6 +18,7 @@ import Profile from '../components/Profile';
 import Register from '../components/Register';
 import AddContact from '../components/AddContact';
 import ContactCard from '../components/ContactCard';
+import MessageBox from '../components/MessageBox';
 import SelectedUser from '../components/SelectedUser';
 import InputMessage from '../components/InputMessage';
 import ContactProfile from '../components/ConatactProfile';
@@ -28,6 +30,7 @@ import RecieverMessageBox from '../components/RecieverMessageBox';
 const Home = () => {
     const { socket } = useContext(SocketContext);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [showSideBar, setShowSideBar] = useState(true);
     const { chat, setChat } = useContext(ChatContext);
     const { auth, setAuth } = useContext(AuthContext);
     const { loader, setLoader } = useContext(LoaderContext);
@@ -59,7 +62,7 @@ const Home = () => {
 
         const handleMessage = (data) => {
             console.log('Received message:', data);
-            const { senderId, recieverId, message, date } = data;
+            const { senderId, recieverId, message, date,} = data;
             const chatPartnerId = senderId === auth.id ? recieverId : senderId;
             const formattedMessage = {
                 senderId,
@@ -105,16 +108,43 @@ const Home = () => {
         }
     }
 
+    const getPendingMessages = async () => {
+        try {
+            const res = await getPendingList(auth.token);
+            if (res.status == 200) {
+                const messages = res.data.messages;
+                const groupedChat = {};
+
+                messages.forEach(msg => {
+                    const chatPartnerId = msg.senderId === auth.id ? msg.recieverId : msg.senderId;
+
+                    if (!groupedChat[chatPartnerId]) {
+                        groupedChat[chatPartnerId] = [];
+                    }
+                    console.log(msg)
+                    groupedChat[chatPartnerId].push({
+                        senderId: msg.senderId,
+                        recieverId: msg.recieverId,
+                        message: msg.message,
+                        date: msg.date
+                    });
+                });
+                setChat(groupedChat);
+            } else {
+                console.log("Error in fetching contact");
+                alert(("Error in fetching contact list"));
+            }
+        } catch (err) {
+            console.log("Error in fetching contact list");
+        }
+    }
+
     useEffect(() => {
         if (auth.email != '') {
             getContacts();
+            getPendingMessages();
         }
     }, [auth]);
-
-
-
-
-
 
 
 
@@ -130,28 +160,28 @@ const Home = () => {
 
         <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup ? 'pointer-events-none filter blur-sm' : ''}`}>
 
-            <div className="col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center">
+            <div className={`col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center ${!showSideBar?'hidden':''}`}>
                 <i className=" text-red-500 text-shadow-lg/40 fa-solid fa-comments text-7xl"></i>
-                <div className="font-serif text-red-500 text-shadow-lg/40 cursor-default italic text-3xl">
+                <div className="font-serif text-red-500 text-shadow-lg/40 cursor-default italic text-3xl" onClick={() => console.log("chat", chat)}>
                     Flow
                 </div>
                 <div className="grow-1"></div>
                 <div className="text-lg"><i className="fas fa-search"></i></div>
             </div>
 
-            {<SelectedUser showContact={setShowContactProfile} selectedUser={selectedUser} />}
+            {<SelectedUser showContact={setShowContactProfile} selectedUser={selectedUser} showSideBar={showSideBar}/>}
 
-            <div className="col-span-1 overflow-y-auto rounded-bl-xl scroll-smooth row-span-4 border-1">
+            <div className={`col-span-1 overflow-y-auto rounded-bl-xl scroll-smooth row-span-4 border-1 ${!showSideBar?'hidden':''}`}>
                 {<AddContact getContacts={getContacts} />}
                 {contact.length > 0 && contact.map((data) => <ContactCard key={data._id} contact={data} setSelectedUser={setSelectedUser} selectedUser={selectedUser} />)}
             </div>
 
-            <div className="col-span-2 rounded-br-xl row-span-4 flex flex-col">
+            <div className={`col-span-2 rounded-br-xl row-span-4 flex flex-col ${showSideBar?'':'col-span-3 rounded-bl-xl'}`}>
                 <div className="grow-1 basis-4/5 overflow-y-auto scroll-smooth flex flex-col">
-                    {<SenderMessageBox />}
-                    {<RecieverMessageBox />}
+                    {<MessageBox selectedUser={selectedUser} />}
+
                 </div>
-                {<InputMessage selectedUser={selectedUser} />}
+                {<InputMessage selectedUser={selectedUser}/>}
             </div>
         </div>
     </div>

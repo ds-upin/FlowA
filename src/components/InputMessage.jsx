@@ -2,23 +2,37 @@ import { useEffect, useRef, useState } from "react";
 import { useContext } from "react";
 import { SocketContext } from "../contexts/Socket";
 import { AuthContext } from "../contexts/Auth";
+import { ChatContext } from "../contexts/Chat";
 
 const InputMessage = (props) => {
     const selectedUser = props.selectedUser;
-    const {auth,setAuth} = useContext(AuthContext);
-    const {socket} = useContext(SocketContext);
+    const { chat, setChat } = useContext(ChatContext);
+    const { auth, setAuth } = useContext(AuthContext);
+    const { socket } = useContext(SocketContext);
     const inputRef = useRef();
-    
+    const addMessageToChat = (userId, newMessage) => {
+        setChat(prevChat => ({
+            ...prevChat,
+            [userId]: [
+                ...(prevChat[userId] || []),
+                newMessage
+            ]
+        }));
+    };
+
     const sendMessage = () => {
         const message = inputRef.current.value.trim();
-        if(message=='') return;
-        if(auth.email==''||selectedUser==null) return;
-        socket.emit('sendMessage',{message,senderId:auth.id,id:selectedUser._id,date:Date.now()});
-        inputRef.current.value='';
+        if (message == '') return;
+        if (auth.email == '' || selectedUser == null) return;
+        socket.emit('sendMessage', { message, senderId: auth.id, id: selectedUser._id, date: Date.now() }, (res) => {
+            console.log(res.status)
+            addMessageToChat(selectedUser._id, { message: message, senderId: auth.id, recieverId: selectedUser._id, date: Date.now(), status: res.status });
+        });
+        inputRef.current.value = '';
     };
 
     return (
-        <div className="basis-1/5 flex justify-center items-center border-2 border-solid rounded-br-xl">
+        <div className="basis-1/5 flex justify-center items-center border-2 border-solid rounded-br-xl ">
 
             <button className="mr-1 px-4 bg-blue-500 text-[120%] mb-2 rounded-lg hover:bg-blue-600">
                 <i className="fa-solid fa-plus"></i>

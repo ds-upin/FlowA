@@ -19,12 +19,12 @@ const Profile = () => {
             <div className="m-auto bg-gray-500 mt-5 w-[40%] aspect-1/1 rounded-full overflow-hidden">
                 <img src={profileImg} />
             </div>
-            <div className="text-center"><button>Change Image</button></div>
+            <div className="text-center"><button onClick={()=>alert("Currently Disabled")}>Change Image</button></div>
             <div className="text-center pt-5 text-2xl">{auth.name}</div>
             <div className='text-md text-center mt-3'><span>Username: </span><span>{auth.username}</span></div>
             <div className='text-md text-center mt-3'><span>Email: </span><span>{auth.email}</span></div>
             <div className='text-md w-full flex justify-center mt-3'>
-                <button className='bg-orange-500 cursor-pointer hover:bg-orange-600 rounded-lg px-5'>Delete Account</button>
+                {/* <button className='bg-orange-500 cursor-pointer hover:bg-orange-600 rounded-lg px-5' >Delete Account</button> */}
             </div>
         </div>
     );
