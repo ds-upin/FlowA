@@ -1,6 +1,7 @@
 import { ShowPopupContext } from '../contexts/ShowPopup';
 import { AuthContext } from '../contexts/Auth';
 import { StateContext } from '../contexts/State';
+import { LoaderContext } from '../contexts/Loader';
 import { useContext } from 'react';
 import profileImg from '../assets/assett.jpg';
 import { removeContact } from '../services/contact.api';
@@ -11,6 +12,7 @@ const ContactProfile = (props) => {
     const selectedUser = props.selectedUser;
     const setSelectedUser = props.setSelectedUser;
     const { setShowContactProfile } = useContext(StateContext);
+    const {loader,setLoader} = useContext(LoaderContext);
     const { auth, setAuth } = useContext(AuthContext);
     const { showPopup, setShowPopup } = useContext(ShowPopupContext);
     const closeProfile = () => {
@@ -19,6 +21,7 @@ const ContactProfile = (props) => {
     };
 
     const removeThisContact = async () => {
+        setLoader(true);
         //console.log(selectedUser);
         try {
             const res = await removeContact({
@@ -40,9 +43,11 @@ const ContactProfile = (props) => {
             console.error("Error removing contact:", err);
             alert("Something went wrong while removing contact.");
         }
+        setLoader(false);
     };
 
     const blockThisUser = async () => {
+        setLoader(true);
         try {
             const res = await blockContact({
                 token: auth.token,
@@ -62,6 +67,7 @@ const ContactProfile = (props) => {
             console.error("Error removing contact:", err);
             alert("Something went wrong while removing contact.");
         }
+        setLoader(false);
     };
 
     return (

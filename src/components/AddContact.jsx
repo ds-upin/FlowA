@@ -2,13 +2,16 @@ import { ContactContext } from "../contexts/Contact";
 import { useContext,useRef } from "react";
 import { addInContact } from "../services/contact.api";
 import { AuthContext } from "../contexts/Auth";
+import { LoaderContext } from "../contexts/Loader";
 
 const AddContact = (props) => {
     const getContacts = props.getContacts;
     const usernameRef = useRef();
     const { auth, setAuth } = useContext(AuthContext);
+    const {loader,setLoader} = useContext(LoaderContext);
 
     const AddContact = async () => {
+        setLoader(true);
         const username = usernameRef.current.value.trim();
         if(username==='') return;
         try {
@@ -22,6 +25,7 @@ const AddContact = (props) => {
         } catch (err) {
             console.log("Error in adding contact");
         }
+        setLoader(false);
     }
     return (
         <div className='w-full h-fit flex flex-row items-center border-1 cursor-default'>

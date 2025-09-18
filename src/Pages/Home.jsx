@@ -32,6 +32,7 @@ const Home = () => {
     const { socket } = useContext(SocketContext);
     const [selectedUser, setSelectedUser] = useState(null);
     const [showSideBar, setShowSideBar] = useState(true);
+    const [showRightSideBar, setShowRightSideBar] = useState(true);
     const { chat, setChat } = useContext(ChatContext);
     const { auth, setAuth } = useContext(AuthContext);
     const { loader, setLoader } = useContext(LoaderContext);
@@ -83,6 +84,7 @@ const Home = () => {
             const isInContacts = contact.some(c => c._id === chatPartnerId);
             if (!isInContacts) {
                 const addContacts = async () => {
+                    setLoader(true);
                     try {
                         const res = await addToContactByIds(auth.token, [chatPartnerId]);
                         if (res.status === 200) {
@@ -93,6 +95,7 @@ const Home = () => {
                     } catch (err) {
                         console.error('Error adding contact:', err);
                     }
+                    setLoader(false);
                 };
                 addContacts();
 
@@ -108,6 +111,7 @@ const Home = () => {
 
     useEffect(() => {
         const syncContactsWithChat = async () => {
+            //setLoader(true);
             if (!auth.token || Object.keys(chat).length === 0 || contact.length === 0) return;
             const chatIds = Object.keys(chat);
             const contactIds = contact.map(c => c._id);
@@ -125,6 +129,7 @@ const Home = () => {
             } catch (err) {
                 console.error('Error adding extra contacts:', err);
             }
+            //setLoader(false);
         };
 
         syncContactsWithChat();
@@ -146,6 +151,7 @@ const Home = () => {
         }
     }, [auth]);
     const getContacts = async () => {
+        setLoader(true);
         try {
             const res = await getContactList(auth.token);
             if (res.status == 200) {
@@ -159,9 +165,11 @@ const Home = () => {
         } catch (err) {
             console.log("Error in fetching contact list");
         }
+        setLoader(false);
     }
 
     const getPendingMessages = async () => {
+        setLoader(true);
         try {
             const res = await getPendingList(auth.token);
             if (res.status == 200) {
@@ -190,6 +198,7 @@ const Home = () => {
         } catch (err) {
             console.log("Error in fetching contact list");
         }
+        setLoader(false);
     }
 
     useEffect(() => {
@@ -214,7 +223,7 @@ const Home = () => {
 
         <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup ? 'pointer-events-none filter blur-sm' : ''}`}>
 
-            <div className={`col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center ${!showSideBar ? 'hidden' : ''}`}>
+            <div className={`col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center ${showSideBar&&!showRightSideBar?'col-span-3':''}  ${!showSideBar&&showRightSideBar?'hidden':''}`}>
                 <i className=" text-red-500 text-shadow-lg/40 fa-solid fa-comments text-7xl"></i>
                 <div className="font-serif text-red-500 text-shadow-lg/40 cursor-default italic text-3xl" onClick={() => console.log("chat", chat)}>
                     Flow
@@ -223,14 +232,14 @@ const Home = () => {
                 <div className="text-lg"><i className="fas fa-search"></i></div>
             </div>
 
-            {<SelectedUser showContact={setShowContactProfile} selectedUser={selectedUser} showSideBar={showSideBar} />}
+            {<SelectedUser showContact={setShowContactProfile} selectedUser={selectedUser} showRightSideBar={showRightSideBar} showSideBar={showSideBar} />}
 
-            <div className={`col-span-1 overflow-y-auto rounded-bl-xl scroll-smooth row-span-4 border-1 ${!showSideBar ? 'hidden' : ''}`}>
+            <div className={`col-span-1 overflow-y-auto rounded-bl-xl scroll-smooth row-span-4 border-1 ${showSideBar&&!showRightSideBar?'col-span-3':''}  ${!showSideBar&&showRightSideBar?'hidden':''}`}>
                 {<AddContact getContacts={getContacts} />}
                 {contact.length > 0 && contact.map((data) => <ContactCard key={data._id} contact={data} setSelectedUser={setSelectedUser} selectedUser={selectedUser} />)}
             </div>
 
-            <div className={`col-span-2 rounded-br-xl row-span-4 flex flex-col ${showSideBar ? '' : 'col-span-3 rounded-bl-xl'}`}>
+            <div className={`col-span-2 rounded-br-xl row-span-4 flex flex-col ${showSideBar&&!showRightSideBar?'hidden':''} ${!showSideBar&&showRightSideBar?'col-span-3':''}`}>
                 <div className="grow-1 basis-4/5 overflow-y-auto scroll-smooth flex flex-col">
                     {<MessageBox selectedUser={selectedUser} />}
 
