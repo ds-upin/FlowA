@@ -244,7 +244,7 @@ const Home = () => {
 
 
 
-    return <div className="flex w-[100vw] h-[100vh] bg-gradient-to-r from-gray-300 to-gray-400">
+    return <div className="flex w-[100vw] h-[100vh] bg-gradient-to-r from-red-100 to-blue-400">
 
         {showContactProfile ? <ContactProfile showContact={setShowContactProfile} getContacts={getContacts} setSelectedUser={setSelectedUser} selectedUser={selectedUser} /> : null}
         {showProfile ? <Profile /> : null}
