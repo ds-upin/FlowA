@@ -11,7 +11,7 @@ export const SocketProvider = ({ children }) => {
     useEffect(() => {
         if (!auth?.token) return; // wait until auth token is ready
 
-        const socketIo = io('http://localhost:8000', {
+        const socketIo = io('https://flowa-server.onrender.com', {
             auth: {
                 token: `Bearer ${auth.token}`,
             },

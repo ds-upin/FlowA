@@ -1,4 +1,4 @@
-const baseurl = 'http://localhost:8000'
+const baseurl = 'https://flowa-server.onrender.com'
 
 export const getPendingList = async (token) => {
     try {

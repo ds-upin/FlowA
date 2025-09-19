@@ -1,15 +1,15 @@
 import { useState, useContext, useEffect } from 'react';
 
+import { ChatContext } from '../contexts/Chat';
 import { AuthContext } from '../contexts/Auth';
 import { StateContext } from '../contexts/State';
 import { LoaderContext } from '../contexts/Loader';
-import { ContactContext } from '../contexts/Contact';
 import { SocketContext } from '../contexts/Socket';
-import { ChatContext } from '../contexts/Chat';
+import { ContactContext } from '../contexts/Contact';
 import { ShowPopupContext } from '../contexts/ShowPopup';
 
-import { getContactList, addToContactByIds } from '../services/contact.api';
 import { getPendingList } from '../services/message.api';
+import { getContactList, addToContactByIds } from '../services/contact.api';
 
 import Login from '../components/Login';
 import Loader from '../components/Loader';
@@ -29,24 +29,58 @@ import { BlockedContext } from '../contexts/Blocked';
 
 
 const Home = () => {
-    const { socket } = useContext(SocketContext);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [showSideBar, setShowSideBar] = useState(true);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [showRightSideBar, setShowRightSideBar] = useState(true);
+
+    const { socket } = useContext(SocketContext);
     const { chat, setChat } = useContext(ChatContext);
     const { auth, setAuth } = useContext(AuthContext);
     const { loader, setLoader } = useContext(LoaderContext);
     const { contact, setContact } = useContext(ContactContext);
-    const { showPopup, setShowPopup } = useContext(ShowPopupContext);
     const { blocked, setBlocked } = useContext(BlockedContext);
+    const { showPopup, setShowPopup } = useContext(ShowPopupContext);
     const { showContactProfile, setShowContactProfile, showBlockedUsers, setShowBlockedUsers, showEmailVerification, setShowEmailVerification, showProfile, setShowProfile, showRegister, setShowRegister, showLogin, setShowLogin } = useContext(StateContext);
 
-    const addNewUserForChat = (userId) => {
-        setChat(prevChat => ({
-            ...prevChat,
-            [userId]: []
-        }));
+
+    // START OF MANAGEMENT OF UI FOR SMART PHONE
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth<=window.innerHeight);
+        };
+
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+    const toggleSidebarsMobile = () => {
+        if (!isMobile) return;
+
+        if (showSideBar) {
+            setShowSideBar(false);
+            setShowRightSideBar(true);
+        } else if (showRightSideBar) {
+            setShowSideBar(true);
+            setShowRightSideBar(false);
+        } else {
+            setShowSideBar(true);
+            setShowRightSideBar(false);
+        }
     };
+    useEffect(() => {
+        if (!isMobile) {
+            setShowSideBar(true);
+            setShowRightSideBar(true);
+        } else {
+            setShowSideBar(true);
+            setShowRightSideBar(false)
+        }
+    }, [isMobile]);
+    //END OF MANAGEMENT OF UI FOR SMART PHONE
+
+
     const addMessageToChat = (userId, newMessage) => {
         setChat(prevChat => ({
             ...prevChat,
@@ -58,14 +92,13 @@ const Home = () => {
     };
 
 
-
     useEffect(() => {
         if (!socket) return;
         socket.emit('registerUser');
 
         const handleMessage = (data) => {
             console.log('Received message:', data);
-            console.log('user',blocked);
+            console.log('user', blocked);
             const { senderId, recieverId, message, date, } = data;
             const chatPartnerId = senderId === auth.id ? recieverId : senderId;
             const formattedMessage = {
@@ -75,7 +108,7 @@ const Home = () => {
                 date
             };
             const isBlocked = blocked.some(user => user._id === chatPartnerId);
-            
+
             if (isBlocked) {
                 console.log('Message ignored because sender is blocked:', chatPartnerId);
                 return;
@@ -107,7 +140,7 @@ const Home = () => {
         return () => {
             socket.off('recieveMessage', handleMessage);
         };
-    }, [socket, auth.id,blocked]);
+    }, [socket, auth.id, blocked]);
 
     useEffect(() => {
         const syncContactsWithChat = async () => {
@@ -220,12 +253,20 @@ const Home = () => {
         {showLogin ? <Login /> : null}
         {showEmailVerification ? <EmailVerification /> : null}
         {showBlockedUsers ? <BlockedUser /> : null}
+        <button
+            onClick={toggleSidebarsMobile}
+            className={`text-red-500 text-2xl px-2 fixed top-1 left-1 z-10 ${isMobile ? '' : 'hidden'} ${(showSideBar && !showRightSideBar) ? 'hidden' : ''}`}
+            aria-label="Toggle sidebar"
+        >
+            Contacts List  <i className="fas fa-exchange-alt"></i>
+        </button>
 
         <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup ? 'pointer-events-none filter blur-sm' : ''}`}>
 
-            <div className={`col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center ${showSideBar&&!showRightSideBar?'col-span-3':''}  ${!showSideBar&&showRightSideBar?'hidden':''}`}>
+            <div className={`col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center ${showSideBar && !showRightSideBar ? 'col-span-3' : ''}  ${!showSideBar && showRightSideBar ? 'hidden' : ''}`}>
                 <i className=" text-red-500 text-shadow-lg/40 fa-solid fa-comments text-7xl"></i>
-                <div className="font-serif text-red-500 text-shadow-lg/40 cursor-default italic text-3xl" onClick={() => console.log("chat", chat)}>
+
+                <div className="font-serif text-red-500 text-shadow-lg/40 cursor-default italic text-3xl">
                     Flow
                 </div>
                 <div className="grow-1"></div>
@@ -234,12 +275,12 @@ const Home = () => {
 
             {<SelectedUser showContact={setShowContactProfile} selectedUser={selectedUser} showRightSideBar={showRightSideBar} showSideBar={showSideBar} />}
 
-            <div className={`col-span-1 overflow-y-auto rounded-bl-xl scroll-smooth row-span-4 border-1 ${showSideBar&&!showRightSideBar?'col-span-3':''}  ${!showSideBar&&showRightSideBar?'hidden':''}`}>
+            <div className={`col-span-1 overflow-y-auto rounded-bl-xl scroll-smooth row-span-4 border-1 ${showSideBar && !showRightSideBar ? 'col-span-3' : ''}  ${!showSideBar && showRightSideBar ? 'hidden' : ''}`}>
                 {<AddContact getContacts={getContacts} />}
-                {contact.length > 0 && contact.map((data) => <ContactCard key={data._id} contact={data} setSelectedUser={setSelectedUser} selectedUser={selectedUser} />)}
+                {contact.length > 0 && contact.map((data) => <ContactCard key={data._id} isMobile={isMobile} toggleSidebarsMobile={toggleSidebarsMobile} contact={data} setSelectedUser={setSelectedUser} selectedUser={selectedUser} />)}
             </div>
 
-            <div className={`col-span-2 rounded-br-xl row-span-4 flex flex-col ${showSideBar&&!showRightSideBar?'hidden':''} ${!showSideBar&&showRightSideBar?'col-span-3':''}`}>
+            <div className={`col-span-2 rounded-br-xl row-span-4 flex flex-col ${showSideBar && !showRightSideBar ? 'hidden' : ''} ${!showSideBar && showRightSideBar ? 'col-span-3' : ''}`}>
                 <div className="grow-1 basis-4/5 overflow-y-auto scroll-smooth flex flex-col">
                     {<MessageBox selectedUser={selectedUser} />}
 
