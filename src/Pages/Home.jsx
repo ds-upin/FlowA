@@ -23,7 +23,7 @@ import InputMessage from '../components/InputMessage';
 import ContactProfile from '../components/ConatactProfile';
 import SenderMessageBox from '../components/SenderMessageBox';
 import EmailVerification from '../components/EmailVerification';
-import BlockedUser from '../components/blockedUser';
+import BlockedUser from '../components/BlockedUser';
 import RecieverMessageBox from '../components/RecieverMessageBox';
 import { BlockedContext } from '../contexts/Blocked';
 

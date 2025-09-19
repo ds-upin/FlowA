@@ -12,6 +12,8 @@ export const SocketProvider = ({ children }) => {
         if (!auth?.token) return; // wait until auth token is ready
 
         const socketIo = io('https://flowa-server.onrender.com', {
+            reconnectionAttempts: 5,
+            reconnectionDelay: 2000,
             auth: {
                 token: `Bearer ${auth.token}`,
             },
