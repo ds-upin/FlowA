@@ -255,7 +255,7 @@ const Home = () => {
         {showBlockedUsers ? <BlockedUser /> : null}
         <button
             onClick={toggleSidebarsMobile}
-            className={`text-red-500 text-2xl px-2 fixed top-1 left-1 z-10 ${isMobile ? '' : 'hidden'} ${(showSideBar && !showRightSideBar) ? 'hidden' : ''}`}
+            className={`text-blue-500 text-2xl px-2 fixed top-1 left-1 z-10 ${isMobile ? '' : 'hidden'} ${(showSideBar && !showRightSideBar) ? 'hidden' : ''}`}
             aria-label="Toggle sidebar"
         >
             Contacts List  <i className="fas fa-exchange-alt"></i>
@@ -264,9 +264,9 @@ const Home = () => {
         <div className={`shadow-xl/30 grid grid-cols-3 grid-rows-5 bg-transparent border bg-transparent bg-opacity-50 rounded-xl my-auto mx-auto w-[90%] h-[90%] ${showPopup ? 'pointer-events-none filter blur-sm' : ''}`}>
 
             <div className={`col-span-1 rounded-tl-xl row-span-1 p-4 flex items-center ${showSideBar && !showRightSideBar ? 'col-span-3' : ''}  ${!showSideBar && showRightSideBar ? 'hidden' : ''}`}>
-                <i className=" text-red-500 text-shadow-lg/40 fa-solid fa-comments text-7xl"></i>
+                <i className=" text-blue-500 text-shadow-lg/40 fa-solid fa-comments text-7xl"></i>
 
-                <div className="font-serif text-red-500 text-shadow-lg/40 cursor-default italic text-3xl">
+                <div className="font-serif text-blue-500 text-shadow-lg/40 cursor-default italic text-3xl">
                     Flow
                 </div>
                 <div className="grow-1"></div>
