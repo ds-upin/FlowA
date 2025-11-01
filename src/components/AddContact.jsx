@@ -13,7 +13,7 @@ const AddContact = (props) => {
     const AddContact = async () => {
         setLoader(true);
         const username = usernameRef.current.value.trim();
-        if(username==='') return;
+        if(username==='') return setLoader(false);;
         try {
             const res = await addInContact({ username, token: auth.token });
             if (res.status === 200) {

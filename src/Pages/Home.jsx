@@ -45,9 +45,25 @@ const Home = () => {
 
     // START OF MANAGEMENT OF UI FOR SMART PHONE
     const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch("https://flowa-server.onrender.com/api/health");
+                if(response.ok){
+                    console.log("Healthy Backend");
+                }
+                const result = await response.json();
+            } catch (error) {
+                console.error("Error", error);
+            }
+        };
+        fetchData();
+    }, []);
+
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth<=window.innerHeight);
+            setIsMobile(window.innerWidth <= window.innerHeight);
         };
 
         handleResize();
