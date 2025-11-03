@@ -283,7 +283,7 @@ const Home = () => {
                 <i className=" text-blue-500 text-shadow-lg/40 fa-solid fa-comments text-7xl"></i>
 
                 <div className="font-serif text-blue-500 text-shadow-lg/40 cursor-default italic text-3xl">
-                    Flow
+                    FlowA
                 </div>
                 <div className="grow-1"></div>
                 <div className="text-lg"><i className="fas fa-search"></i></div>
